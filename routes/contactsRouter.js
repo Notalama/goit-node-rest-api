@@ -9,7 +9,7 @@ import {
 import {
   createContactSchema,
   updateContactSchema,
-} from "../schemas/contactsSchemas.js";
+} from "../schemas/contactSchemas.js";
 import validateBody from "../helpers/validateBody.js";
 
 const contactsRouter = express.Router();
