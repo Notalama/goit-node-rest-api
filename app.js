@@ -2,10 +2,18 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import "express-async-errors"; 
-
+import sequelize from "./db/sequelize.js";
 import contactsRouter from "./routes/contactsRouter.js";
 
 const app = express();
+
+try {
+  await sequelize.authenticate();
+  console.log("Database connection successful");
+} catch (error) {
+  console.error("Unable to connect to the database:", error.message);
+  process.exit(1);
+}
 
 app.use(morgan("tiny"));
 app.use(cors());

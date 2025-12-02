@@ -5,6 +5,7 @@ import {
   deleteContact,
   createContact,
   updateContact,
+  updateFavorite,
 } from "../controllers/contactsControllers.js";
 import {
   createContactSchema,
@@ -19,5 +20,6 @@ contactsRouter.get("/:id", getOneContact);
 contactsRouter.delete("/:id", deleteContact);
 contactsRouter.post("/", validateBody(createContactSchema), createContact);
 contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
+contactsRouter.patch("/:id/favorite", updateFavorite);
 
 export default contactsRouter;
