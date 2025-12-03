@@ -1,65 +1,74 @@
+import { nanoid } from "nanoid";
 import Contact from "../models/Contact.js";
 
-export const listContacts = async () => {
-  const contacts = await Contact.findAll();
-  return contacts;
-};
+async function listContacts(userId, page = 1, limit = 20, favorite = null) {
+  const offset = (page - 1) * limit;
 
-export const getContactById = async (contactId) => {
-  return await Contact.findByPk(contactId);
-};
+  const where = { owner: userId };
 
-export const addContact = async (name, email, phone) => {
-  const newContact = await Contact.create({
-    name,
-    email,
-    phone,
+  if (favorite !== null) {
+    where.favorite = favorite;
+  }
+
+  const { count, rows } = await Contact.findAndCountAll({
+    where,
+    limit,
+    offset,
   });
 
-  return newContact;
-};
+  return {
+    contacts: rows,
+    total: count,
+    page,
+    limit,
+  };
+}
 
-export const removeContact = async (contactId) => {
-  const contact = await Contact.findByPk(contactId);
+async function getContactById(contactId, userId) {
+  return await Contact.findOne({ where: { id: contactId, owner: userId } });
+}
 
-  if (!contact) {
-    return null;
-  }
-
+async function removeContact(contactId, userId) {
+  const contact = await Contact.findOne({
+    where: { id: contactId, owner: userId },
+  });
+  if (!contact) return null;
   await contact.destroy();
   return contact;
-};
+}
 
-export const updateContact = async (
-  contactId,
-  name,
-  email,
-  phone,
-  favorite
-) => {
-  const contact = await Contact.findByPk(contactId);
+async function addContact(data, userId) {
+  const newContact = await Contact.create({
+    id: nanoid(21),
+    ...data,
+    owner: userId,
+  });
+  return newContact;
+}
 
-  if (!contact) {
-    return null;
-  }
-
-  if (name !== undefined) contact.name = name;
-  if (email !== undefined) contact.email = email;
-  if (phone !== undefined) contact.phone = phone;
-  if (favorite !== undefined) contact.favorite = favorite;
-
-  await contact.save();
+async function updateContact(contactId, updateData, userId) {
+  const contact = await Contact.findOne({
+    where: { id: contactId, owner: userId },
+  });
+  if (!contact) return null;
+  await contact.update(updateData);
   return contact;
-};
+}
 
-export const updateStatusContact = async (contactId, favorite) => {
-  const contact = await Contact.findByPk(contactId);
-  if (!contact) {
-    throw new Error(`Contact id: ${contactId} not existed`);
-  }
-
-  contact.favorite = favorite;
-  await contact.save();
-
+async function updateStatusContact(contactId, body, userId) {
+  const contact = await Contact.findOne({
+    where: { id: contactId, owner: userId },
+  });
+  if (!contact) return null;
+  await contact.update(body);
   return contact;
+}
+
+export default {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+  updateStatusContact,
 };
