@@ -1,8 +1,7 @@
 import authService from "../services/authServices.js";
 import HttpError from "../helpers/HttpError.js";
-import ctrlWrapper from "../helpers/ctrlWrapper.js";
 
-export const register = ctrlWrapper(async (req, res, next) => {
+export const register = async (req, res, next) => {
   const { email, password } = req.body;
 
   const user = await authService.register(email, password);
@@ -12,9 +11,9 @@ export const register = ctrlWrapper(async (req, res, next) => {
   }
 
   res.status(201).json({ user });
-});
+};
 
-export const login = ctrlWrapper(async (req, res, next) => {
+export const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   const result = await authService.login(email, password);
@@ -24,9 +23,9 @@ export const login = ctrlWrapper(async (req, res, next) => {
   }
 
   res.status(200).json(result);
-});
+};
 
-export const logout = ctrlWrapper(async (req, res, next) => {
+export const logout = async (req, res, next) => {
   const result = await authService.logout(req.user.id);
 
   if (!result) {
@@ -34,15 +33,15 @@ export const logout = ctrlWrapper(async (req, res, next) => {
   }
 
   res.status(204).send();
-});
+};
 
-export const getCurrent = ctrlWrapper(async (req, res, next) => {
-  const { email, subscription } = req.user;
+export const getCurrent = async (req, res, next) => {
+  const { email, subscription, avatarURL } = req.user;
 
-  res.status(200).json({ email, subscription });
-});
+  res.status(200).json({ email, subscription, avatarURL });
+};
 
-export const updateSubscription = ctrlWrapper(async (req, res, next) => {
+export const updateSubscription = async (req, res, next) => {
   const { subscription } = req.body;
 
   const user = await authService.updateSubscription(req.user.id, subscription);
@@ -52,4 +51,18 @@ export const updateSubscription = ctrlWrapper(async (req, res, next) => {
   }
 
   res.status(200).json(user);
-});
+};
+
+export const updateAvatar = async (req, res, next) => {
+  if (!req.file) {
+    return next(HttpError(400, "No file uploaded"));
+  }
+
+  const result = await authService.updateAvatar(req.user.id, req.file);
+
+  if (!result) {
+    return next(HttpError(404, "User not found"));
+  }
+
+  res.status(200).json(result);
+};

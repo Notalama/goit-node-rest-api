@@ -26,15 +26,22 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       defaultValue: null,
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
+    avatarURL: {
+      type: DataTypes.STRING,
+      defaultValue: null,
+      field: "avatar_url",
     },
-    updated_at: {
+    createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW,
+      field: "created_at",
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+      field: "updated_at",
     },
   },
   {
